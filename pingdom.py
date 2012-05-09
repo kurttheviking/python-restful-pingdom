@@ -114,3 +114,39 @@ class Pingdom(object):
            response_time = avgresponse
         return response_time
 
+    def probe_results(self, check_id, minutes_back=None, only_active=True):
+        """
+        A relatively simple function to obtain probe-level results from the API.
+
+        @param check_id: The pingdom check id number associated with the target resource
+        @param minutes_back: Time window within which ping results should be gathered
+        @param only_active: Limit returned probe data to active probes; result data will
+                            have None as the returned probe property
+
+        @return: Array of results, each also containing an additional property ('probe')
+                 that details probe-specific properties iff the probe is active
+        """
+        activeprobes = {}
+        probe_parameters = {}
+        result_parameters = {}
+
+        if minutes_back:
+            from_time = "%.0f" % (time.time() - 60 * minutes_back)
+            result_parameters['from'] = from_time
+
+        if only_active:
+            probe_parameters['onlyactive'] = 'true'
+
+        probes = self.method('probes/', parameters=probe_parameters)['probes']
+        for p in probes:
+            activeprobes[p['id']] = p
+
+        results = self.method('results/%s/' % check_id, parameters=result_parameters)['results']
+        for r in results:
+            if r['probeid'] in activeprobes:
+                r['probe'] = activeprobes[r['probeid']]
+            else:
+                r['probe'] = None
+
+        return results
+

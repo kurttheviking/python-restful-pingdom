@@ -51,7 +51,8 @@ Some shortcut methods that were useful to me::
     # Average Response Time for the last 15 minutes in the US
     p.avg_response(CHEKC_ID_NUM, minutes_back=15, country='US')
     
-    
+    # Detailed Response Result data including probe information
+    p.probe_results(CHEKC_ID_NUM, minutes_back=15)    
 
 .. _`Pingdom REST API`: http://www.pingdom.com/services/api-documentation-rest/
 .. _`Pingdom SOAP API`: http://www.pingdom.com/services/api-documentation/
